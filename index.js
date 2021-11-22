@@ -1,6 +1,6 @@
 const Nightmare = require('nightmare');
-const username = '6289509133696';
-const password = 'fni91199';
+const username = '*******';
+const password = '******';
 
 var XLSX = require('xlsx');
 var workbook = XLSX.readFile('list.xlsx');
