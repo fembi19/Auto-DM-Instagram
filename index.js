@@ -8,10 +8,10 @@ var xldata = XLSX.utils.sheet_to_json(workbook.Sheets["Sheet1"]);
 
 const nighmare = Nightmare({
     show: true,
-    waitTimeout: 360000,
-    goTimeout: 360000,
-    loadTimeout: 360000,
-    executionTimeout: 360000,
+    waitTimeout: 36000,
+    goTimeout: 36000,
+    loadTimeout: 36000,
+    executionTimeout: 36000,
     webPreferences: {
         partition: 'nopersist',
         images: false,
@@ -26,7 +26,8 @@ nighmare
     .insert('input[name=username]', username)
     .insert('input[name=password]', password)
     .click('button[type="submit"]')
-    .wait('input[placeholder=Search');
+    // .wait('input[placeholder=Search');
+    .wait(3000);
 
 nilai = 0;
 
@@ -48,43 +49,56 @@ function proses() {
             .exists('h2[class="rkEop"]')
             .then(function (result) {
                 if (result) {
-                    console.log("akun private");
+                    console.log('\x1b[33m%s\x1b[0m', "Akun " + namaid + " Private ");
+                    proses();
                 } else {
                     return nighmare
                         .exists('h2[class="MCXLF"]') //cek akun dihapus/tidak
                         .then(function (cekakun) {
                             if (cekakun) {
-                                console.log("Akun dihapus");
+                                console.log('\x1b[33m%s\x1b[0m', "Akun " + namaid + " dihapus ");
                                 proses();
                             } else {
-                                console.log("Membuka pesan " + namaid);
+
                                 return nighmare
-                                    .wait(3000)
-                                    .evaluate(function () {
-                                        document.getElementsByTagName("button")[0].click();
-                                    })
-                                    .wait(3000)
-                                    .exists('button[class="_7UhW9   xLCgt       qyrsm KV-D4              fDxYl    T0kll "]')
-                                    .then(function (cek) {
-                                        if (cek) {
-                                            console.log("Mengirim " + namaid + "...");
-                                            return nighmare
-                                                .click('button[class="_7UhW9   xLCgt       qyrsm KV-D4              fDxYl    T0kll "]')
-                                                .wait('textarea[placeholder="Message..."]')
-                                                .type('textarea[placeholder="Message..."]', pesan)
-                                                .type('textarea[placeholder="Message..."]', '\u000d')
-                                                .then(function () {
-                                                    proses();
-                                                })
+                                    .exists('h2[class="_7UhW9      x-6xq    qyrsm KV-D4          uL8Hv     l4b0S    "]') //cek url akun
+                                    .then(function (tesakun) {
+                                        if (tesakun) {
+                                            console.log('\x1b[33m%s\x1b[0m', "Akun " + namaid + " Tidak ditemukan ");
+                                            proses();
                                         } else {
-                                            console.log("Mengirim " + namaid + "...");
+                                            // console.log("Membuka pesan " + namaid);
+                                            console.log("Mengirim " + namaid);
                                             return nighmare
-                                                .wait('textarea[placeholder="Message..."]')
-                                                .type('textarea[placeholder="Message..."]', pesan)
-                                                .type('textarea[placeholder="Message..."]', '\u000d')
-                                                .then(function () {
-                                                    console.log("Terkirim");
-                                                    proses();
+                                                .wait(3000)
+                                                .evaluate(function () {
+                                                    document.getElementsByTagName("button")[0].click();
+                                                })
+                                                .wait(3000)
+                                                .exists('button[class="_7UhW9   xLCgt       qyrsm KV-D4              fDxYl    T0kll "]')
+                                                .then(function (cek) {
+                                                    if (cek) {
+                                                        // console.log("Mengirim " + namaid + "...");
+                                                        return nighmare
+                                                            .click('button[class="_7UhW9   xLCgt       qyrsm KV-D4              fDxYl    T0kll "]')
+                                                            .wait('textarea[placeholder="Message..."]')
+                                                            .type('textarea[placeholder="Message..."]', pesan)
+                                                            .type('textarea[placeholder="Message..."]', '\u000d')
+                                                            .then(function () {
+                                                                console.log('\x1b[32m%s\x1b[0m', namaid + " Terkirim");
+                                                                proses();
+                                                            })
+                                                    } else {
+                                                        // console.log("Mengirim " + namaid + "...");
+                                                        return nighmare
+                                                            .wait('textarea[placeholder="Message..."]')
+                                                            .type('textarea[placeholder="Message..."]', pesan)
+                                                            .type('textarea[placeholder="Message..."]', '\u000d')
+                                                            .then(function () {
+                                                                console.log('\x1b[32m%s\x1b[0m', namaid + " Terkirim");
+                                                                proses();
+                                                            })
+                                                    }
                                                 })
                                         }
                                     })
@@ -102,69 +116,17 @@ function proses() {
 
 }
 
-proses();
+nighmare
+    .exists('input[placeholder=Search')
+    .then(function (ceklogin) {
+        if (!ceklogin) {
+            console.log('\x1b[31m%s\x1b[0m', "Gagal Login, Koneksi Lambat Atau Data Salah");
+            process.exit();
+        } else {
+            console.log("Berhasil login");
+            console.log('Mendapatkan data Excel');
+            console.log('Mulai Mengirim');
+            proses();
 
-
-// if (nilai == xldata.length) {
-//     console.log("Tugas telah selesai");
-// }
-
-// function balik() {
-//     nighmare
-//         .goto('https://instagram.com/' + xldata[nilai].username)
-//         .exists('h2[class="rkEop"]')
-//         .then(function (result) {
-//             nilai++;
-//             if (result) {
-//                 console.log("akun private");
-//                 balik();
-//             } else {
-//                 return nighmare
-//                     .exists('h2[class="MCXLF"]') //cek akun dihapus/tidak
-//                     .then(function (cekakun) {
-//                         if (cekakun) {
-//                             console.log("Akun dihapus");
-//                             balik();
-//                         } else {
-//                             console.log("siap kirim pesan");
-//                             return nighmare
-//                                 .wait(3000)
-//                                 .evaluate(function () {
-//                                     document.getElementsByTagName("button")[0].click();
-//                                 })
-//                                 .wait(3000)
-//                                 .exists('button[class="_7UhW9   xLCgt       qyrsm KV-D4              fDxYl    T0kll "]')
-//                                 .then(function (cek) {
-//                                     if (cek) {
-//                                         return nighmare
-//                                             .click('button[class="_7UhW9   xLCgt       qyrsm KV-D4              fDxYl    T0kll "]')
-//                                             .wait('textarea[placeholder="Message..."]')
-//                                             // .type('textarea[placeholder="Message..."]', xldata2[nilai].pesan)
-//                                             .type('textarea[placeholder="Message..."]', 'Testing Pesan')
-//                                             .type('textarea[placeholder="Message..."]', '\u000d')
-//                                             .then(function () {
-//                                                 balik();
-//                                             })
-//                                     } else {
-//                                         return nighmare
-//                                             .wait('textarea[placeholder="Message..."]')
-//                                             // .type('textarea[placeholder="Message..."]', xldata2[nilai].pesan)
-//                                             .type('textarea[placeholder="Message..."]', 'Testing Pesan')
-//                                             .type('textarea[placeholder="Message..."]', '\u000d')
-//                                             .then(function () {
-//                                                 balik();
-//                                             })
-//                                     }
-//                                 })
-//                         }
-//                     })
-
-//             }
-//         })
-//         .catch(function (error) {
-//             console.log(error);
-
-//         });
-
-// }
-// balik();
+        }
+    });
